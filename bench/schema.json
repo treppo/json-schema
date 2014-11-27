@@ -1,0 +1,256 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Bulk index request",
+  "type": "object",
+  "properties": {
+    "offers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/definitions/positiveInteger"
+          },
+          "code": {
+            "$ref": "#/definitions/nonEmptyString"
+          },
+          "titles": {
+            "type": "object",
+            "patternProperties": {
+              "^[a-z]{2}$": {
+                "$ref": "#/definitions/nonEmptyString"
+              }
+            },
+            "additionalProperties": false
+          },
+          "object_types": {
+            "$ref": "#/definitions/arrayOfNonEmptyStrings"
+          },
+          "amenities": {
+            "$ref": "#/definitions/arrayOfNonEmptyStrings"
+          },
+          "public_coordinate": {
+            "$ref": "#/definitions/coordinate"
+          },
+          "confidential_coordinate": {
+            "$ref": "#/definitions/coordinate"
+          },
+          "geo_location_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/positiveInteger"
+            }
+          },
+          "max_guest_count": {
+            "$ref": "#/definitions/positiveInteger"
+          },
+          "bedroom_count": {
+            "$ref": "#/definitions/positiveInteger"
+          },
+          "main_photo_id": {
+            "$ref": "#/definitions/positiveInteger"
+          },
+          "is_external": {
+            "type": "boolean"
+          },
+          "first_published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pricing": {
+            "type": "object",
+            "properties": {
+              "rate": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "from_price": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "cleaning_fee": {
+                "$ref": "#/definitions/nonNegativeInteger"
+              },
+              "included_guest_count": {
+                "$ref": "#/definitions/nonNegativeInteger"
+              },
+              "extra_guest_cost": {
+                "$ref": "#/definitions/nonNegativeInteger"
+              },
+              "weekly_discount_rate": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "monthly_discount_rate": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "special_rates": {
+                "type": "object",
+                "patternProperties": {
+                  "^\\d{4}-\\d{2}-\\d{2}$": {
+                    "$ref": "#/definitions/positiveInteger"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "daily_discount_rates": {
+                "type": "object",
+                "patternProperties": {
+                  "^\\d{4}-\\d{2}-\\d{2}$": {
+                    "type": "object",
+                    "properties": {
+                      "weekly_rate": {
+                        "$ref": "#/definitions/positiveInteger"
+                      },
+                      "monthly_rate": {
+                        "$ref": "#/definitions/positiveInteger"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["rate", "from_price"],
+            "dependencies": {
+              "included_guest_count": ["extra_guest_cost"]
+            }
+          },
+          "availabilities": {
+            "type": "object",
+            "properties": {
+              "default_min_nights": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "max_nights": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "min_delay": {
+                "$ref": "#/definitions/positiveInteger"
+              },
+              "unavailable_dates": {
+                "$ref": "#/definitions/arrayOfDates"
+              },
+              "checkin_blocked_dates": {
+                "$ref": "#/definitions/arrayOfDates"
+              },
+              "checkout_blocked_dates": {
+                "$ref": "#/definitions/arrayOfDates"
+              },
+              "min_nights": {
+                "type": "object",
+                "patternProperties": {
+                  "^\\d{4}-\\d{2}-\\d{2}$": {
+                    "$ref": "#/definitions/nonNegativeInteger"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": ["default_min_nights", "max_nights"]
+          },
+          "ranking": {
+            "type": "object",
+            "properties": {
+              "displays": {
+                "type": "object",
+                "properties": {
+                  "search_displays_weighted": {
+                    "$ref": "#/definitions/nonNegativeNumber"
+                  }
+                },
+                "additionalProperties": {
+                  "$ref": "#/definitions/nonNegativeNumber"
+                },
+                "required": ["search_displays_weighted"]
+              },
+              "simple_scores": {
+                "type": "object",
+                "properties": {
+                  "instantly_bookable": {
+                    "type": "boolean"
+                  },
+                  "farmer_score": {
+                    "type": "number"
+                  },
+                  "price_score": {
+                    "type": "number"
+                  },
+                  "quality_score": {
+                    "type": "number"
+                  }
+                },
+                "required": ["farmer_score", "price_score", "quality_score"]
+              },
+              "bookings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "guests": {
+                      "$ref": "#/definitions/positiveInteger"
+                    },
+                    "successful": {
+                      "type": "boolean"
+                    },
+                    "net_revenue": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": ["guests", "successful", "net_revenue"]
+                }
+              }
+            },
+            "required": ["displays", "simple_scores"]
+          }
+        },
+        "required": ["id", "code", "titles", "object_types", "public_coordinate", "confidential_coordinate", "geo_location_ids", "max_guest_count", "bedroom_count", "is_external", "pricing", "availabilities", "ranking"]
+      }
+    },
+    "refresh": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "arrayOfNonEmptyStrings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/nonEmptyString"
+      }
+    },
+    "positiveInteger": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "nonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "nonNegativeNumber": {
+      "type": "number",
+      "minimum": 0.0
+    },
+    "arrayOfDates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "coordinate": {
+      "type":  "object",
+      "properties": {
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": ["lat", "lng"]
+    }
+  }
+}
